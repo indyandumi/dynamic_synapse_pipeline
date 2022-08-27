@@ -1,0 +1,15 @@
+{
+	"name": "ls_serverless_sql_pool_db_nyc_taxi_ldw",
+	"properties": {
+		"description": "The available linked is is for dedicated SQL pool, we are going to uses the same and change the end point to server less SQL pool",
+		"annotations": [],
+		"type": "AzureSqlDW",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:ludo-workspace-ondemand.sql.azuresynapse.net,1433;Initial Catalog=nyc_taxi_ldw"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
