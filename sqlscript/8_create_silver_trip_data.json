@@ -1,0 +1,17 @@
+{
+	"name": "8_create_silver_trip_data",
+	"properties": {
+		"content": {
+			"query": "USE nyc_taxi_ldw;\nIF OBJECT_ID('silver.trip_data_green') IS NOT NULL\n    DROP EXTERNAL TABLE silver.trip_data_green\n GO\n \nCREATE EXTERNAL TABLE silver.trip_data_green\nWITH\n( \n    DATA_SOURCE = nyc_taxi_src,\n    LOCATION = 'silver/trip_data_green',\n    FILE_FORMAT = parquet_file_format\n) AS\nSELECT  * FROM  bronze.trip_data_green_csv;\n\n-- select data from silver_trip_data_green\nSELECT  * FROM  silver.vw_trip_data_green;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

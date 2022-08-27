@@ -1,0 +1,17 @@
+{
+	"name": "12_create_silver_payment_type",
+	"properties": {
+		"content": {
+			"query": "USE nyc_taxi_ldw;\nIF OBJECT_ID('silver.payment_type') IS NOT NULL\n    DROP EXTERNAL TABLE silver.payment_type\n GO\n \nCREATE EXTERNAL TABLE silver.payment_type\nWITH\n( \n    DATA_SOURCE = nyc_taxi_src,\n    LOCATION = 'silver/payment_type',\n    FILE_FORMAT = parquet_file_format\n) AS\n-- we will select from operrowset fundtion\nSELECT * from bronze.vw_payment_type;\n\n-- select data from silver payment_type\nSELECT  * FROM  silver.payment_type;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

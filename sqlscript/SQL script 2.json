@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 2",
+	"properties": {
+		"content": {
+			"query": "-- This is auto-generated code\n\nexec sp_describe_first_result_set N'\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK ''https://ludostorageaccount.dfs.core.windows.net/nyc-taxidata/raw/trip_type.tsv'',\n        FORMAT = ''CSV'',\n        PARSER_VERSION = ''2.0'',\n        FIELDTERMINATOR =''\\t''\n    ) AS [result]\n    '\n\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://ludostorageaccount.dfs.core.windows.net/nyc-taxidata/raw/trip_type.tsv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        --HEADER_ROW = TRUE,\n         FIELDTERMINATOR = '\\t'\n    ) AS [result]\n    \n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"name": "13_silver_trip_data_green",
+	"properties": {
+		"content": {
+			"query": "USE nyc_taxi_ldw;\nIF OBJECT_ID('silver.trip_data_green') IS NOT NULL\n    DROP EXTERNAL TABLE silver.trip_data_green\n GO\n \nCREATE EXTERNAL TABLE silver.trip_data_green\nWITH\n( \n    DATA_SOURCE = nyc_taxi_src,\n    LOCATION = 'silver/trip_data_green',\n    FILE_FORMAT = parquet_file_format\n) AS\n-- we will select from operrowset fundtion\nSELECT * from bronze.trip_data_green_csv;\n\n-- select data from silver payment_type\nSELECT  * FROM  silver.trip_data_green;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

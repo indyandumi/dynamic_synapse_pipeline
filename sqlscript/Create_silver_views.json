@@ -1,0 +1,17 @@
+{
+	"name": "Create_silver_views",
+	"properties": {
+		"content": {
+			"query": "\nUSE nyc_taxi_ldw\n\nGO\n-- create view for trip data\n\nDROP VIEW IF EXISTS silver.vw_trip_data_green\n\nGO\n\nCREATE VIEW silver.vw_trip_data_green\nAS \nSELECT\n    result.filepath(1) AS year,\n    result.filepath(2) AS month,\n    result.*\n    \n    FROM\n    OPENROWSET(\n        BULK 'silver/trip_data_green/year=*/month=*/*.parquet',\n        DATA_SOURCE = 'nyc_taxi_src',\n        FORMAT = 'PARQUET'\n            ) \n    WITH (\n     [VendorID] INT,\n\t[lpep_pickup_datetime] datetime2(7),\n\t[lpep_dropoff_datetime] datetime2(7),\n\t[store_and_fwd_flag] char(1),\n\t[RatecodeID] INT,\n\t[PULocationID] INT,\n\t[DOLocationID] INT,\n\t[passenger_count] INT,\n\t[trip_distance] float,\n\t[fare_amount] float,\n\t[extra] float,\n\t[mta_tax] float,\n\t[tip_amount] float,\n\t[tolls_amount] float,\n\t[ehail_fee] INT,\n\t[improvement_surcharge] float,\n\t[total_amount] float,\n\t[payment_type] INT,\n\t[trip_type] INT,\n\t[congestion_surcharge] float\n    ) AS [result]\n   -- WHERE result.filepath(1) ='2020'\n    --AND result.filepath(2) IN ('06','07','09')\n   -- GROUP BY result.filename(), result.filepath(1), result.filepath(2)\n   -- ORDER BY result.filename(), result.filepath(1), result.filepath(2);\n\nGO\n   select top (100) * from silver.vw_trip_data_green;\n\nGO\n\n\n\n\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

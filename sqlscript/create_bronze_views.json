@@ -1,0 +1,17 @@
+{
+	"name": "create_bronze_views",
+	"properties": {
+		"content": {
+			"query": "-- Create rate code view using rate_code.json file\nUSE nyc_taxi_ldw\nGO\nDROP VIEW IF EXISTS bronze.vw_rate_code\n\nGO\nCREATE VIEW bronze.vw_rate_code\nAS\nSELECT rate_code_id,rate_code\nFROM\n    OPENROWSET(\n       BULK  'raw/rate_code.json',\n       DATA_SOURCE = 'nyc_taxi_src',\n       FORMAT ='CSV',\n       PARSER_VERSION ='1.0',\n       FIELDTERMINATOR ='0x0b',\n       FIELDQUOTE = '0x0b',\n       ROWTERMINATOR = '0x0b'\n           )\n    WITH\n    (\njsonDoc NVARCHAR (MAX)\n    ) AS rate_code\nCROSS APPLY OPENJSON(jsonDoc)\nWITH \n( rate_code_id TINYINT,\n  rate_code VARCHAR(20)\n\n)\n\nGO\n\nSELECT * FROM bronze.vw_rate_code\n\nGO\n\n-- Create rate code view using payment_type.json file\n\nUSE nyc_taxi_ldw\nGO\nDROP VIEW IF EXISTS bronze.vw_payment_type\n\nGO\nCREATE VIEW bronze.vw_payment_type\nAS\nSELECT payment_type, payment_type_desc\nFROM\n    OPENROWSET(\n       BULK  'raw/payment_type.json',\n       DATA_SOURCE = 'nyc_taxi_src',\n       FORMAT ='CSV',\n       PARSER_VERSION ='1.0',\n       FIELDTERMINATOR ='0x0b',\n       FIELDQUOTE = '0x0b',\n       ROWTERMINATOR ='0x0a'\n           )\n    WITH\n    (\njsonDoc NVARCHAR (MAX)\n    ) AS payment_type\nCROSS APPLY OPENJSON(jsonDoc)\nWITH (\n    payment_type SMALLINT,\n    payment_type_desc VARCHAR(20)\n\n)\n\nGO\n\nselect * from bronze.vw_payment_type\n\nGO\n\n-- create view for trip_data_green\nDROP VIEW IF EXISTS bronze.vw_trip_data_green_csv\n\nGO\nCREATE VIEW bronze.vw_trip_data_green_csv\nAS \nSELECT\n    result.filepath(1) AS year,\n    result.filepath(2) AS month,\n    result.*\n    \n    FROM\n    OPENROWSET(\n        BULK 'raw/trip_data_green_csv/year=*/month=*/*.csv',\n        DATA_SOURCE = 'nyc_taxi_src',\n        FORMAT = 'CSV',\n        HEADER_ROW = TRUE,\n        PARSER_VERSION = '2.0'\n    ) \n    WITH (\n     [VendorID] INT,\n\t[lpep_pickup_datetime] datetime2(7),\n\t[lpep_dropoff_datetime] datetime2(7),\n\t[store_and_fwd_flag] char(1),\n\t[RatecodeID] INT,\n\t[PULocationID] INT,\n\t[DOLocationID] INT,\n\t[passenger_count] INT,\n\t[trip_distance] float,\n\t[fare_amount] float,\n\t[extra] float,\n\t[mta_tax] float,\n\t[tip_amount] float,\n\t[tolls_amount] float,\n\t[ehail_fee] INT,\n\t[improvement_surcharge] float,\n\t[total_amount] float,\n\t[payment_type] INT,\n\t[trip_type] INT,\n\t[congestion_surcharge] float\n    ) AS [result]\n   -- WHERE result.filepath(1) ='2020'\n    --AND result.filepath(2) IN ('06','07','09')\n   -- GROUP BY result.filename(), result.filepath(1), result.filepath(2)\n   -- ORDER BY result.filename(), result.filepath(1), result.filepath(2);\n\nGO\n   select top (100) * from bronze.vw_trip_data_green_csv;\n   \n   select count(*) from bronze.vw_trip_data_green_csv\n   WHERE year ='2020' and month='01'\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

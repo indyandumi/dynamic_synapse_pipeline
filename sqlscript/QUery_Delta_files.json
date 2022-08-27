@@ -1,0 +1,17 @@
+{
+	"name": "QUery_Delta_files",
+	"properties": {
+		"content": {
+			"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_delta/',\n        FORMAT = 'DELTA',\n        DATA_SOURCE = 'nyc_taxidata_raw'\n    ) AS trip_data;\n-- When specifying columns , you have to include the partition columns on the with clause\n\n\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_delta/',\n        FORMAT = 'DELTA',\n        DATA_SOURCE = 'nyc_taxidata_raw'\n    )\n    WITH (\n        tip_amount FLOAT,\n        trip_type INT,\n        year VARCHAR(4),\n        month VARCHAR(4)\n    ) AS trip_data;\n\n-- Delta lake gives ability to keep history\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_discovery",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

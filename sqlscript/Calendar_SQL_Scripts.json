@@ -1,0 +1,20 @@
+{
+	"name": "Calendar_SQL_Scripts",
+	"properties": {
+		"folder": {
+			"name": "Demo"
+		},
+		"content": {
+			"query": "USE nyc_taxi_discovery;\n\nselect * \nfrom OPENROWSET (\n    BULK 'calendar.csv',\n    DATA_SOURCE ='nyc_taxidata_raw',\n    FORMAT = 'CSV',\n    PARSER_VERSION='2.0',\n    HEADER_ROW = TRUE\n) as cal\n\n--run sp to get data types\nexec sp_describe_first_result_set N'select * \nfrom OPENROWSET (\n    BULK ''calendar.csv'',\n    DATA_SOURCE =''nyc_taxidata_raw'',\n    FORMAT = ''CSV'',\n    PARSER_VERSION=''2.0'',\n    HEADER_ROW = TRUE\n) as cal\n'\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_discovery",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
