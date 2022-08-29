@@ -1,0 +1,88 @@
+{
+	"name": "pl_create_silver_trip_data_green",
+	"properties": {
+		"description": "This pipeline will transform the partitioned  trip data files into Paquet file format.\nThis pipeline will process all the data in all partitions whenever the new data is added.\nWe will use script activity to get partition year and month from the view create against bronze/raw data.\nOne we can the list of partitioned  year and month from the view, we will use For Each Loop activity to iterate through all list of partitions\nThe we will create delete activity to delete the partitions before we run stored procedure activity to create the folders and partitions with new data.\nLastly, we will create views on top of newly created parquet format partied files\n",
+		"activities": [
+			{
+				"name": "Get Trip Year and Month",
+				"type": "Script",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "ls_serverless_sql_pool_db_nyc_taxi_ldw",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "USE nyc_taxi_ldw;\nselect DISTINCT\n year, month from bronze.vw_trip_data_green_csv;"
+						}
+					]
+				}
+			},
+			{
+				"name": "ForEach Year and Month",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get Trip Year and Month",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get Trip Year and Month').output.resultSets[0].Rows",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"batchCount": 5,
+					"activities": [
+						{
+							"name": "Delete Partitions",
+							"type": "Delete",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "ds_nyc_taxi_data_dynamic",
+									"type": "DatasetReference",
+									"parameters": {
+										"p_folder_path": {
+											"value": "silver/trip_data_green/year=@{item().year}/month=@{item().month}",
+											"type": "Expression"
+										}
+									}
+								},
+								"enableLogging": false,
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"annotations": []
+	}
+}
