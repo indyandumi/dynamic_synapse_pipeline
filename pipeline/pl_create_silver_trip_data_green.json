@@ -124,6 +124,46 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "Create SIlver View",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "ForEach Year and Month",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "ls_serverless_sql_pool_db_nyc_taxi_ldw",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "NonQuery",
+							"text": "USE nyc_taxi_ldw;\n"
+						},
+						{
+							"type": "NonQuery",
+							"text": "\n\n-- create view for trip_data_green\nDROP VIEW IF EXISTS silver.vw_trip_data_green;\n\n"
+						},
+						{
+							"type": "NonQuery",
+							"text": "\nCREATE VIEW silver.vw_trip_data_green\nAS \nSELECT\n    result.filepath(1) AS year,\n    result.filepath(2) AS month,\n    result.*\n    \n    FROM\n    OPENROWSET(\n        BULK 'raw/trip_data_green_csv/year=*/month=*/*.csv',\n        DATA_SOURCE = 'nyc_taxi_src',\n        FORMAT = 'CSV',\n        HEADER_ROW = TRUE,\n        PARSER_VERSION = '2.0'\n    ) \n    WITH (\n     [VendorID] INT,\n\t[lpep_pickup_datetime] datetime2(7),\n\t[lpep_dropoff_datetime] datetime2(7),\n\t[store_and_fwd_flag] char(1),\n\t[RatecodeID] INT,\n\t[PULocationID] INT,\n\t[DOLocationID] INT,\n\t[passenger_count] INT,\n\t[trip_distance] float,\n\t[fare_amount] float,\n\t[extra] float,\n\t[mta_tax] float,\n\t[tip_amount] float,\n\t[tolls_amount] float,\n\t[ehail_fee] INT,\n\t[improvement_surcharge] float,\n\t[total_amount] float,\n\t[payment_type] INT,\n\t[trip_type] INT,\n\t[congestion_surcharge] float\n    ) AS [result];\n   "
+						}
+					]
+				}
 			}
 		],
 		"annotations": []
