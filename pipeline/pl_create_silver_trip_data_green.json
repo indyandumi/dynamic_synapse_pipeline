@@ -49,7 +49,7 @@
 					"batchCount": 5,
 					"activities": [
 						{
-							"name": "Delete Partitions",
+							"name": "Delete silver Partitions",
 							"type": "Delete",
 							"dependsOn": [],
 							"policy": {
@@ -80,11 +80,11 @@
 							}
 						},
 						{
-							"name": "create partitions",
+							"name": "create  silver partitions",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "Delete Partitions",
+									"activity": "Delete silver Partitions",
 									"dependencyConditions": [
 										"Succeeded"
 									]
