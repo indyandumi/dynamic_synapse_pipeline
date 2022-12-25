@@ -1,0 +1,81 @@
+{
+	"name": "pl_master_pipeline",
+	"properties": {
+		"description": "This pipeline will execute pl_create_silver_tables and pl_create_silver_trip_data_green pipe line in parallel followed by pl_create_gold_trip_data_greeb pipeline.\nPl_gold_* pipe line has dependencies on pl_silver_data_green pipeline",
+		"activities": [
+			{
+				"name": "Execute create silver tables",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_create_silver_tables",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Execute create silver trip data green",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_create_silver_trip_data_green",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Execute gold trip data green",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Execute create silver tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Execute create silver trip data green",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_create_gold_trip_data_green",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Execute gold trip data green_Agg",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Execute create silver trip data green",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_create_gold_trip_data_green_agg",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"annotations": []
+	}
+}

@@ -1,0 +1,29 @@
+{
+	"name": "ds_nyc_taxi_data_dynamic",
+	"properties": {
+		"description": "this data set is going to point to nyc taxi data and the folder path is going to be dynamic",
+		"linkedServiceName": {
+			"referenceName": "ls_ludo_workspace_dl",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"p_folder_path": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@dataset().p_folder_path",
+					"type": "Expression"
+				},
+				"fileSystem": "nyc-taxidata"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
